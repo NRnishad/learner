@@ -15,4 +15,25 @@ export class MongoUserRepository implements IUserRepository {
             createdAt: savedUser.createdAt,
         }
     }
+
+    async findByEmail(email:string):Promise<User|null>{
+        const user = await UserModel.findOne({email})
+        if(!user) return null;
+        return{
+            id: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            isVerified: user.isVerified,
+            
+        }
+    }
+
+
+
+    async findById(id:string):Promise<User|null>{
+        const user = await UserModel.findById(id)
+        if(!user) return null;
+        return user as unknown as User
+}
 }
