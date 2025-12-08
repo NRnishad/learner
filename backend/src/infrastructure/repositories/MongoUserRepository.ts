@@ -23,8 +23,10 @@ export class MongoUserRepository implements IUserRepository {
             id: user._id.toString(),
             name: user.name,
             email: user.email,
+            password: user.password,
             role: user.role,
             isVerified: user.isVerified,
+            createdAt: user.createdAt
             
         }
     }

@@ -1,18 +1,27 @@
 import { Router } from "express";
 import { AuthController } from "../../../presentation/controllers/AuthController";
 import { RegisterUser } from "../../../application/use-cases/RegisterUser";
+import { LoginUser } from "../../../application/use-cases/LoginUser"; 
 import { MongoUserRepository } from "../../repositories/MongoUserRepository";
-import { BcryptServece } from "../../services/BcryptService";
+import { BcryptService } from "../../services/BcryptService";
+import { JwtService } from "../../services/JwtService"; 
 
+const authRouter = Router();
 
-const authRoutes = Router();
-
+// --- Dependency Injection ---
 const repository = new MongoUserRepository();
-const passwordService = new BcryptServece();
-const useCase = new RegisterUser(repository,passwordService);
-const controller = new AuthController(useCase);
+const passwordService = new BcryptService();
+const tokenService = new JwtService(); // Initialize
 
+// Initialize Use Cases
+const registerUseCase = new RegisterUser(repository, passwordService);
+const loginUseCase = new LoginUser(repository, passwordService, tokenService); // Inject all 3
 
-authRoutes.post('/register', (req, res) => controller.register(req, res));
+// Initialize Controller
+const controller = new AuthController(registerUseCase, loginUseCase);
 
-export default authRoutes;
+// --- Routes ---
+authRouter.post("/register", (req, res) => controller.register(req, res));
+authRouter.post("/login", (req, res) => controller.login(req, res)); // New Route
+
+export default authRouter;
